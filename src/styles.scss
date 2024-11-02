@@ -1,0 +1,44 @@
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+
+// Include the common styles for Angular Material.
+@include mat.core();
+
+// Define the theme object.
+$keepers-challenge-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    density: (
+      scale: 0,
+    ),
+  )
+);
+
+:root {
+  @include mat.all-component-themes($keepers-challenge-theme);
+}
+
+// Comment out the line below if you want to use the pre-defined typography utility classes.
+// For more information: https://material.angular.io/guide/typography#using-typography-styles-in-your-application.
+// @include mat.typography-hierarchy($keepers-challenge-theme);
+
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+  font-family: 'Inter', 'Inter Placeholder', sans-serif;
+  line-height: 1.5;
+  tab-size: 4;
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  font-family: inherit;
+}
