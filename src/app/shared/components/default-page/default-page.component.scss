@@ -35,6 +35,23 @@ mat-sidenav-content {
   height: 100%;
 }
 
-.main-section {
+.mat-mdc-list-item {
+  &:hover::ng-deep,
+  &.active::ng-deep {
+    mat-icon,
+    span {
+      color: var(--color-primary);
+    }
+  }
+  .menu-item {
+    &__count {
+      float: right;
+      color: grey;
+    }
+  }
+}
+
+section.main-section {
+  background: var(--color-background);
   padding: var(--spacing-lg) var(--spacing-xl);
 }

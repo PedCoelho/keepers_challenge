@@ -5,4 +5,8 @@ import { Component } from '@angular/core';
   templateUrl: './main-toolbar.component.html',
   styleUrl: './main-toolbar.component.scss',
 })
-export class MainToolbarComponent {}
+export class MainToolbarComponent {
+  public handleNavigation() {
+    location.replace('/');
+  }
+}

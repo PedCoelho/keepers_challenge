@@ -2,14 +2,26 @@
   <mat-sidenav
     #drawer
     class="sidenav"
-    [fixedTopGap]="85"
+    [fixedTopGap]="toolbarHeight"
     [fixedInViewport]="true"
     [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="(isHandset$ | async) === false"
   >
-    <mat-nav-list>
-      <a mat-list-item href="#">Deals</a>
+    <mat-nav-list *ngFor="let entry of menuConfig">
+      <a
+        mat-list-item
+        tabindex="0"
+        (click)="handleMenuTriggering(entry)"
+        (keydown.enter)="handleMenuTriggering(entry)"
+        [ngClass]="{ active: entry.active }"
+      >
+        <mat-icon matListItemIcon>{{ entry.icon }}</mat-icon>
+        {{ entry.label }}
+        <span class="menu-item__count" *ngIf="entry.results">{{
+          entry.results
+        }}</span>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
