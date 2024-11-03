@@ -1,0 +1,40 @@
+.sidenav-container {
+  height: 100%;
+}
+
+.sidenav {
+  width: 300px;
+  background-color: white;
+  border-radius: unset;
+  padding: var(--spacing-lg);
+}
+
+.mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: white;
+  border: 1px solid lightgrey;
+
+  button[mat-icon-button] {
+    margin-right: var(--spacing-md);
+  }
+
+  span {
+    font-weight: bold;
+    font-size: small;
+    letter-spacing: 0.1ch;
+    text-transform: uppercase;
+  }
+}
+
+mat-sidenav-content {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  height: 100%;
+}
+
+.main-section {
+  padding: var(--spacing-lg) var(--spacing-xl);
+}
