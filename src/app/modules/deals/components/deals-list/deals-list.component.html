@@ -3,12 +3,12 @@
   [pageActions]="pageActions"
   [menuConfig]="pageMenu"
   (menuTriggered)="handleMenuSelection($event)"
-  (searchTriggered)="handleSearch($event)"
+  (searchTriggered)="search$.next($event)"
 >
   <table
-    *ngIf="(filteredDeals$ | async) !== null"
+    *ngIf="(currentDeals$ | async) !== null"
     mat-table
-    [dataSource]="filteredDeals$"
+    [dataSource]="currentDeals$"
   >
     <!-- Checkbox Column -->
     <ng-container matColumnDef="select">

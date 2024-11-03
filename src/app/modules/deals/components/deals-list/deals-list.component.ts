@@ -1,7 +1,14 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { firstValueFrom, map, Observable, Subscription, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  firstValueFrom,
+  map,
+  Observable,
+  Subscription,
+  switchMap,
+} from 'rxjs';
 import { PageAction } from 'src/app/shared/models/default-page.model';
 import { MenuEntry } from 'src/app/shared/models/menu.model';
 import { Deal, DealCategories } from '../../models/deals.model';
@@ -59,7 +66,10 @@ export class DealsListComponent implements OnInit, OnDestroy {
 
   public activeMenu: MenuEntry = this.pageMenu[0];
   public deals$!: Observable<Deal[]>;
-  public filteredDeals$!: Observable<Deal[]>;
+  public search$: BehaviorSubject<string> = new BehaviorSubject('');
+  public activeFilters$: BehaviorSubject<any> = new BehaviorSubject(null);
+
+  public currentDeals$!: Observable<Deal[]>;
 
   private subscriptions: Subscription[] = [];
 
@@ -71,7 +81,6 @@ export class DealsListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initializeSubscriptions();
-    this.filteredDeals$ = this.deals$;
   }
 
   ngOnDestroy(): void {
@@ -91,29 +100,39 @@ export class DealsListComponent implements OnInit, OnDestroy {
   public async toggleAllRows(): Promise<void> {
     if (this.isAllSelected()) {
       this.selection.clear();
-    } else
-      this.selection.select(...(await firstValueFrom(this.filteredDeals$)));
+    } else this.selection.select(...(await firstValueFrom(this.currentDeals$)));
   }
 
-  public handleSearch(value: string) {
-    if (!value) {
-      this.filteredDeals$ = this.deals$;
-    }
+  public handleSearch(deals: Deal[], searchTerm: string): Deal[] {
+    if (!searchTerm.length) return deals;
+    return deals.filter((deal) =>
+      JSON.stringify(deal).toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
 
-    this.filteredDeals$ = this.deals$.pipe(
-      map((deals) =>
-        deals.filter((deal) =>
-          JSON.stringify(deal).toLowerCase().includes(value.toLowerCase())
+  private initializeSubscriptions() {
+    this.initializeRouteChangeListener();
+    this.initializeDealCounts();
+    this.initializeDeals();
+  }
+
+  private initializeDeals() {
+    this.deals$ = this.route.params.pipe(
+      switchMap(() =>
+        this.dealsService.getDeals(this.activeMenu.path as DealCategories)
+      )
+    );
+
+    this.currentDeals$ = this.search$.pipe(
+      switchMap((search) =>
+        this.deals$.pipe(
+          map((deals: Deal[]) => this.handleSearch(deals, search))
         )
       )
     );
   }
 
-  private initializeSubscriptions() {
-    this.subscriptions.push(
-      this.route.params.subscribe((params) => this.handleRouteUpdates(params))
-    );
-
+  private initializeDealCounts() {
     this.subscriptions.push(
       this.dealsService.getDealCounts().subscribe((counts) => {
         Object.entries(counts).forEach(([category, value]) => {
@@ -123,11 +142,11 @@ export class DealsListComponent implements OnInit, OnDestroy {
         });
       })
     );
+  }
 
-    this.deals$ = this.route.params.pipe(
-      switchMap(() =>
-        this.dealsService.getDeals(this.activeMenu.path as DealCategories)
-      )
+  private initializeRouteChangeListener() {
+    this.subscriptions.push(
+      this.route.params.subscribe((params) => this.handleRouteUpdates(params))
     );
   }
 
