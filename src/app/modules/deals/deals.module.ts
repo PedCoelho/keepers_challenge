@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { DefaultPageModule } from 'src/app/shared/components/default-page/default-page.module';
-import { DealsListComponent } from './components/deals-list.component';
+import { DealsListComponent } from './components/deals-list/deals-list.component';
 import { DealsRoutingModule } from './deals-routing.module';
 
 @NgModule({
