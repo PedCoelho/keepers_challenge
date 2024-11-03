@@ -1,6 +1,7 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { map, Observable, shareReplay } from 'rxjs';
+import { PageAction } from '../../models/default-page.model';
 import { MenuEntry } from '../../models/menu.model';
 
 @Component({
@@ -10,6 +11,7 @@ import { MenuEntry } from '../../models/menu.model';
 })
 export class DefaultPageComponent {
   @Input() pageTitle?: string;
+  @Input() pageActions: PageAction[] = [];
   @Input() menuConfig: MenuEntry[] = [];
 
   @Output() menuTriggered = new EventEmitter<MenuEntry>();
