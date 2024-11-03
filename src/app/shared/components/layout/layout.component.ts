@@ -1,9 +1,9 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
-  AfterViewInit,
   Component,
   ElementRef,
   inject,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -15,8 +15,8 @@ import { MainToolbarComponent } from '../main-toolbar/main-toolbar.component';
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',
 })
-export class LayoutComponent implements AfterViewInit {
-  @ViewChild(MainToolbarComponent, { read: ElementRef })
+export class LayoutComponent implements OnInit {
+  @ViewChild(MainToolbarComponent, { static: true, read: ElementRef })
   toolbarRef!: ElementRef;
 
   protected toolbarHeight = 80;
@@ -30,7 +30,7 @@ export class LayoutComponent implements AfterViewInit {
       shareReplay()
     );
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.toolbarHeight = this.toolbarRef.nativeElement.offsetHeight;
   }
 }

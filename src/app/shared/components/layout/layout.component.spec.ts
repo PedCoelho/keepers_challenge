@@ -1,7 +1,7 @@
-import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-
 import { LayoutComponent } from './layout.component';
+import { LayoutModule } from './layout.module';
 
 describe('LayoutComponent', () => {
   let component: LayoutComponent;
@@ -9,7 +9,7 @@ describe('LayoutComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [NoopAnimationsModule]
+      imports: [LayoutModule, NoopAnimationsModule],
     }).compileComponents();
   }));
 

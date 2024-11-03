@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MainToolbarComponent } from './main-toolbar.component';
+import { MainToolbarModule } from './main-toolbar.module';
 
 describe('MainToolbarComponent', () => {
   let component: MainToolbarComponent;
@@ -7,7 +8,7 @@ describe('MainToolbarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MainToolbarComponent],
+      imports: [MainToolbarModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MainToolbarComponent);
