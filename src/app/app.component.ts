@@ -5,7 +5,7 @@ import { LayoutModule } from './shared';
 @Component({
   standalone: true,
   imports: [LayoutModule, RouterModule],
-  selector: 'app-root',
+  selector: 'keepers-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
