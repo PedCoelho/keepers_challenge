@@ -28,6 +28,7 @@
       },
       "configurations": {
         "production": {
+          "baseHref": "/keepers_challenge",
           "budgets": [
             {
               "type": "initial",

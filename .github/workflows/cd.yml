@@ -17,3 +17,5 @@ jobs:
     steps:
       - id: build-publish
         uses: bitovi/github-actions-angular-to-github-pages@v1.0.0
+        with:
+          build_command: nx build --base-href=/${{ github.event.repository.name }}/ && cp dist/${{ github.event.repository.name }}/browser/index.html dist/${{ github.event.repository.name }}/browser/404.html
