@@ -1,6 +1,14 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { map, Observable, shareReplay } from 'rxjs';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnDestroy,
+  Output,
+} from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { debounceTime, map, Observable, shareReplay, Subscription } from 'rxjs';
 import { PageAction } from '../../models/default-page.model';
 import { MenuEntry } from '../../models/menu.model';
 
@@ -9,22 +17,37 @@ import { MenuEntry } from '../../models/menu.model';
   templateUrl: './default-page.component.html',
   styleUrl: './default-page.component.scss',
 })
-export class DefaultPageComponent {
+export class DefaultPageComponent implements OnDestroy {
   @Input() pageTitle?: string;
   @Input() pageActions: PageAction[] = [];
   @Input() menuConfig: MenuEntry[] = [];
 
   @Output() menuTriggered = new EventEmitter<MenuEntry>();
+  @Output() searchTriggered = new EventEmitter<string>();
 
-  protected readonly toolbarHeight = 85;
+  public readonly toolbarHeight = 85;
 
-  protected readonly breakpointObserver = inject(BreakpointObserver);
-  protected isHandset$: Observable<boolean> = this.breakpointObserver
+  public readonly breakpointObserver = inject(BreakpointObserver);
+  public isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
     .pipe(
       map((result) => result.matches),
       shareReplay()
     );
+
+  public search = new FormControl();
+  private subscriptions: Subscription[] = [];
+
+  constructor() {
+    const sub = this.search.valueChanges
+      .pipe(debounceTime(50))
+      .subscribe((val) => this.searchTriggered.emit(val));
+    this.subscriptions.push(sub);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
+  }
 
   public handleMenuTriggering(entry: MenuEntry) {
     this.unselectMenuItems();

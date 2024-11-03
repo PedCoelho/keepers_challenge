@@ -3,8 +3,13 @@
   [pageActions]="pageActions"
   [menuConfig]="pageMenu"
   (menuTriggered)="handleMenuSelection($event)"
+  (searchTriggered)="handleSearch($event)"
 >
-  <table mat-table [dataSource]="currentDeals$">
+  <table
+    *ngIf="(filteredDeals$ | async) !== null"
+    mat-table
+    [dataSource]="filteredDeals$"
+  >
     <!-- Checkbox Column -->
     <ng-container matColumnDef="select">
       <th mat-header-cell *matHeaderCellDef>
@@ -12,7 +17,6 @@
           (change)="$event ? toggleAllRows() : null"
           [checked]="selection.hasValue() && isAllSelected()"
           [indeterminate]="selection.hasValue() && !isAllSelected()"
-          [aria-label]="checkboxLabel()"
         >
         </mat-checkbox>
       </th>
@@ -22,7 +26,6 @@
           (keydown.enter)="$event.stopPropagation()"
           (change)="$event ? selection.toggle(row) : null"
           [checked]="selection.isSelected(row)"
-          [aria-label]="checkboxLabel(row)"
         >
         </mat-checkbox>
       </td>

@@ -1,7 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { firstValueFrom, Observable, Subscription, switchMap, tap } from 'rxjs';
+import { firstValueFrom, map, Observable, Subscription, switchMap } from 'rxjs';
 import { PageAction } from 'src/app/shared/models/default-page.model';
 import { MenuEntry } from 'src/app/shared/models/menu.model';
 import { Deal, DealCategories } from '../../models/deals.model';
@@ -34,7 +34,7 @@ export class DealsListComponent implements OnInit, OnDestroy {
     },
   ];
 
-  protected readonly pageMenu: MenuEntry[] = [
+  public readonly pageMenu: MenuEntry[] = [
     {
       icon: 'description',
       label: 'Acquisitions',
@@ -57,8 +57,9 @@ export class DealsListComponent implements OnInit, OnDestroy {
     },
   ];
 
-  protected activeMenu: MenuEntry = this.pageMenu[0];
-  protected currentDeals$!: Observable<Deal[]>;
+  public activeMenu: MenuEntry = this.pageMenu[0];
+  public deals$!: Observable<Deal[]>;
+  public filteredDeals$!: Observable<Deal[]>;
 
   private subscriptions: Subscription[] = [];
 
@@ -70,6 +71,7 @@ export class DealsListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initializeSubscriptions();
+    this.filteredDeals$ = this.deals$;
   }
 
   ngOnDestroy(): void {
@@ -89,16 +91,22 @@ export class DealsListComponent implements OnInit, OnDestroy {
   public async toggleAllRows(): Promise<void> {
     if (this.isAllSelected()) {
       this.selection.clear();
-    } else this.selection.select(...(await firstValueFrom(this.currentDeals$)));
+    } else
+      this.selection.select(...(await firstValueFrom(this.filteredDeals$)));
   }
 
-  public checkboxLabel(row?: Deal): string {
-    if (!row) {
-      return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
+  public handleSearch(value: string) {
+    if (!value) {
+      this.filteredDeals$ = this.deals$;
     }
-    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${
-      row.name + 1
-    }`;
+
+    this.filteredDeals$ = this.deals$.pipe(
+      map((deals) =>
+        deals.filter((deal) =>
+          JSON.stringify(deal).toLowerCase().includes(value.toLowerCase())
+        )
+      )
+    );
   }
 
   private initializeSubscriptions() {
@@ -116,11 +124,10 @@ export class DealsListComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.currentDeals$ = this.route.params.pipe(
+    this.deals$ = this.route.params.pipe(
       switchMap(() =>
         this.dealsService.getDeals(this.activeMenu.path as DealCategories)
-      ),
-      tap((deals) => (this.activeMenu.results = deals.length))
+      )
     );
   }
 
@@ -130,6 +137,8 @@ export class DealsListComponent implements OnInit, OnDestroy {
     const selectedMenu = this.pageMenu.find(
       (menuItem) => menuItem.path === mode
     );
+
+    this.selection.clear();
 
     if (!mode || !selectedMenu) {
       this.handleRedirect();

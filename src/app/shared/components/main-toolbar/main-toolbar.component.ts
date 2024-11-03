@@ -7,6 +7,6 @@ import { Component } from '@angular/core';
 })
 export class MainToolbarComponent {
   public handleNavigation() {
-    location.replace('/');
+    location.replace('');
   }
 }

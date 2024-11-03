@@ -35,22 +35,34 @@
         >
           <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
-        <span>{{ pageTitle }}</span>
+        <span *ngIf="(isHandset$ | async) === false">{{ pageTitle }}</span>
       </section>
-      <section>search</section>
-      <section class="toolbar-page-actions">
-        <ng-container *ngFor="let action of pageActions">
-          <button
-            mat-button
-            (click)="action.action()"
-            (keydown.enter)="action.action()"
-          >
-            <mat-icon aria-label="Side nav action icon">{{
-              action.icon
-            }}</mat-icon>
-            {{ action.label }}
-          </button>
-        </ng-container>
+      <section class="toolbar-interactions">
+        <section class="toolbar-interactions__search smaller-density-2">
+          <mat-form-field>
+            <mat-icon matPrefix>search</mat-icon>
+            <input
+              matInput
+              placeholder="search"
+              type="search"
+              [formControl]="search"
+            />
+          </mat-form-field>
+        </section>
+        <section class="toolbar-interactions__page-actions">
+          <ng-container *ngFor="let action of pageActions">
+            <button
+              mat-flat-button
+              (click)="action.action()"
+              (keydown.enter)="action.action()"
+            >
+              <mat-icon aria-label="Side nav action icon">{{
+                action.icon
+              }}</mat-icon>
+              {{ action.label }}
+            </button>
+          </ng-container>
+        </section>
       </section>
     </mat-toolbar>
     <section class="main-section">

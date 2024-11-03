@@ -28,3 +28,11 @@ body {
   font-family: inherit;
   background-color: var(--color-background);
 }
+
+.smaller-density-1 {
+  @include mat.all-component-densities(-1);
+}
+
+.smaller-density-2 {
+  @include mat.all-component-densities(-2);
+}

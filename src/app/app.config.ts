@@ -1,4 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter } from '@angular/router';
@@ -12,6 +13,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: MAT_ICON_DEFAULT_OPTIONS,
       useValue: { fontSet: 'material-icons-outlined' },
+    },
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: { appearance: 'outline', subscriptSizing: 'dynamic' },
     },
   ],
 };
