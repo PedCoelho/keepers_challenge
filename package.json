@@ -5,6 +5,7 @@
   "scripts": {
     "start": "nx serve",
     "build": "nx build",
+    "copy-index": "cp dist/keepers_challenge/browser/index.html dist/keepers_challenge/browser/404.html",
     "deploy": "gh-pages -d dist/keepers_challenge/browser",
     "lint": "nx lint --fix",
     "test": "nx test",
