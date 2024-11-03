@@ -1,2 +1,75 @@
-<keepers-default-page [pageTitle]="activeMenu.label" [menuConfig]="pageMenu">
+<keepers-default-page
+  [pageTitle]="activeMenu.label"
+  [pageActions]="pageActions"
+  [menuConfig]="pageMenu"
+  (menuTriggered)="handleMenuSelection($event)"
+>
+  <table mat-table [dataSource]="currentDeals$">
+    <!-- Checkbox Column -->
+    <ng-container matColumnDef="select">
+      <th mat-header-cell *matHeaderCellDef>
+        <mat-checkbox
+          (change)="$event ? toggleAllRows() : null"
+          [checked]="selection.hasValue() && isAllSelected()"
+          [indeterminate]="selection.hasValue() && !isAllSelected()"
+          [aria-label]="checkboxLabel()"
+        >
+        </mat-checkbox>
+      </th>
+      <td mat-cell *matCellDef="let row">
+        <mat-checkbox
+          (click)="$event.stopPropagation()"
+          (keydown.enter)="$event.stopPropagation()"
+          (change)="$event ? selection.toggle(row) : null"
+          [checked]="selection.isSelected(row)"
+          [aria-label]="checkboxLabel(row)"
+        >
+        </mat-checkbox>
+      </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>NAME</th>
+      <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+    </ng-container>
+
+    <!-- Address Column -->
+    <ng-container matColumnDef="address">
+      <th mat-header-cell *matHeaderCellDef>ADDRESS</th>
+      <td mat-cell *matCellDef="let element">{{ element.address }}</td>
+    </ng-container>
+
+    <!-- Price Column -->
+    <ng-container matColumnDef="purchasePrice">
+      <th mat-header-cell *matHeaderCellDef>PURCHASE PRICE</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.purchasePrice | currency }}
+      </td>
+    </ng-container>
+
+    <!-- Net Operating Column -->
+    <ng-container matColumnDef="netOperatingIncome">
+      <th mat-header-cell *matHeaderCellDef>INTERNAL NOI</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.netOperatingIncome | currency }}
+      </td>
+    </ng-container>
+
+    <!-- Cap Rate Column -->
+    <ng-container matColumnDef="capRate">
+      <th mat-header-cell *matHeaderCellDef>CAP RATE</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.capRate | percent }}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+      (click)="selection.toggle(row)"
+      (keydown.space)="selection.toggle(row)"
+    ></tr>
+  </table>
 </keepers-default-page>

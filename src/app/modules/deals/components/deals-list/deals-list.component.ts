@@ -1,19 +1,44 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { SelectionModel } from '@angular/cdk/collections';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { firstValueFrom, Observable, Subscription, switchMap, tap } from 'rxjs';
+import { PageAction } from 'src/app/shared/models/default-page.model';
 import { MenuEntry } from 'src/app/shared/models/menu.model';
+import { Deal, DealCategories } from '../../models/deals.model';
+import { DealsService } from './../../services/deals.service';
 
 @Component({
   selector: 'keepers-deals-list',
   templateUrl: './deals-list.component.html',
   styleUrl: './deals-list.component.scss',
 })
-export class DealsListComponent implements OnInit {
+export class DealsListComponent implements OnInit, OnDestroy {
+  public readonly displayedColumns: string[] = [
+    'select',
+    'name',
+    'address',
+    'purchasePrice',
+    'netOperatingIncome',
+    'capRate',
+  ];
+
+  public readonly selection = new SelectionModel<Deal>(true, []);
+
+  public readonly pageActions: PageAction[] = [
+    {
+      action: () => {
+        throw new Error('Function not implemented.');
+      },
+      label: 'Add',
+      icon: 'add',
+    },
+  ];
+
   protected readonly pageMenu: MenuEntry[] = [
     {
       icon: 'description',
       label: 'Acquisitions',
       path: 'acquisitions',
-      results: 12,
     },
     {
       icon: 'description',
@@ -33,22 +58,78 @@ export class DealsListComponent implements OnInit {
   ];
 
   protected activeMenu: MenuEntry = this.pageMenu[0];
+  protected currentDeals$!: Observable<Deal[]>;
+
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly dealsService: DealsService
   ) {}
 
   ngOnInit(): void {
-    this.handleMenuSelection();
+    this.initializeSubscriptions();
   }
 
-  private handleMenuSelection() {
-    const { mode } = this.route.snapshot.params;
-    console.log(this.route.snapshot.params);
-    console.log(mode);
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
+  }
 
-    const selectedMenu = this.pageMenu.find((item) => item.path.includes(mode));
+  public handleMenuSelection(menu: MenuEntry) {
+    this.router.navigateByUrl(`deals/${menu.path}`);
+  }
+
+  public isAllSelected(): boolean {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.activeMenu.results;
+    return numSelected === numRows;
+  }
+
+  public async toggleAllRows(): Promise<void> {
+    if (this.isAllSelected()) {
+      this.selection.clear();
+    } else this.selection.select(...(await firstValueFrom(this.currentDeals$)));
+  }
+
+  public checkboxLabel(row?: Deal): string {
+    if (!row) {
+      return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
+    }
+    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${
+      row.name + 1
+    }`;
+  }
+
+  private initializeSubscriptions() {
+    this.subscriptions.push(
+      this.route.params.subscribe((params) => this.handleRouteUpdates(params))
+    );
+
+    this.subscriptions.push(
+      this.dealsService.getDealCounts().subscribe((counts) => {
+        Object.entries(counts).forEach(([category, value]) => {
+          const menuItem = this.pageMenu.find((menu) => menu.path === category);
+          if (!menuItem) return;
+          menuItem.results = value;
+        });
+      })
+    );
+
+    this.currentDeals$ = this.route.params.pipe(
+      switchMap(() =>
+        this.dealsService.getDeals(this.activeMenu.path as DealCategories)
+      ),
+      tap((deals) => (this.activeMenu.results = deals.length))
+    );
+  }
+
+  private handleRouteUpdates(params: Params) {
+    const { mode } = params;
+
+    const selectedMenu = this.pageMenu.find(
+      (menuItem) => menuItem.path === mode
+    );
 
     if (!mode || !selectedMenu) {
       this.handleRedirect();
@@ -59,7 +140,6 @@ export class DealsListComponent implements OnInit {
   }
 
   private handleRedirect() {
-    console.log('redirecting');
-    // this.router.navigateByUrl('deals/acquisition');
+    this.router.navigate(['deals', 'acquisitions']);
   }
 }

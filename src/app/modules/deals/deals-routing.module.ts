@@ -3,7 +3,7 @@ import { Route, RouterModule } from '@angular/router';
 import { DealsListComponent } from './components/deals-list/deals-list.component';
 
 const routes: Route[] = [
-  { path: '', redirectTo: 'acquisition', pathMatch: 'full' },
+  { path: '', redirectTo: 'acquisitions', pathMatch: 'full' },
   { path: ':mode', component: DealsListComponent },
 ];
 
