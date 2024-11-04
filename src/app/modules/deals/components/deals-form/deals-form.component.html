@@ -1,0 +1,83 @@
+<section class="deals-form__header">
+  <mat-icon>description</mat-icon>
+  <h2>Add Deal</h2>
+  <h4>({{ selectedDealCategory | uppercase }})</h4>
+</section>
+<section class="deals-form__inputs" [formGroup]="form">
+  <mat-form-field>
+    <mat-label>Name</mat-label>
+    <input matInput type="text" [formControl]="form.controls.name" />
+    <mat-icon matIconSuffix>person</mat-icon>
+    <mat-error *ngIf="form.controls.address.hasError('required')"
+      >Field is required</mat-error
+    >
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Address</mat-label>
+    <input matInput type="text" [formControl]="form.controls.address" />
+    <mat-icon matIconSuffix>apartment</mat-icon>
+    <mat-error *ngIf="form.controls.address.hasError('required')"
+      >Field is required</mat-error
+    >
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Purchase Price</mat-label>
+    <input
+      matInput
+      type="number"
+      step="100000"
+      [formControl]="form.controls.purchasePrice"
+      [min]="0"
+    />
+    <span matTextSuffix>$</span>
+    <mat-error *ngIf="form.controls.purchasePrice.hasError('min')"
+      >Value must be greater than 0</mat-error
+    >
+    <mat-error *ngIf="form.controls.purchasePrice.hasError('required')"
+      >Field is required</mat-error
+    >
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Net Operating Income</mat-label>
+    <input
+      matInput
+      type="number"
+      step="500"
+      [formControl]="form.controls.netOperatingIncome"
+      [min]="0"
+    />
+    <span matTextSuffix>$</span>
+    <mat-error *ngIf="form.controls.netOperatingIncome.hasError('min')"
+      >Value must be greater than 0</mat-error
+    >
+    <mat-error *ngIf="form.controls.netOperatingIncome.hasError('required')"
+      >Field is required</mat-error
+    >
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Cap Rate</mat-label>
+    <input
+      matInput
+      [value]="form.controls.capRate.value | percent"
+      [disabled]="true"
+    />
+    <mat-icon matTextSuffix>%</mat-icon>
+    <mat-error *ngIf="form.controls.capRate.hasError('required')"
+      >Field is required</mat-error
+    >
+  </mat-form-field>
+</section>
+<section class="deals-form__footer">
+  <button mat-button secondary (click)="close()">
+    <mat-icon>close</mat-icon>
+    Cancel
+  </button>
+  <button
+    mat-flat-button
+    (click)="confirm.emit(form.getRawValue())"
+    [disabled]="form.invalid"
+  >
+    <mat-icon>check</mat-icon>
+    Confirm
+  </button>
+</section>

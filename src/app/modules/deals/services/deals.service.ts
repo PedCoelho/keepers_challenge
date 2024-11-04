@@ -13,6 +13,11 @@ export class DealsService {
     return of(this.deals.filter((deal) => deal.category === category));
   }
 
+  public setDeal(deal: Deal): Observable<Deal[]> {
+    this.deals.unshift(deal);
+    return of(this.deals);
+  }
+
   public getDealCounts(): Observable<Record<DealCategories, number>> {
     return of(
       this.deals.reduce<Record<DealCategories, number>>(

@@ -1,6 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   BehaviorSubject,
@@ -16,6 +17,7 @@ import { PageAction } from 'src/app/shared/models/default-page.model';
 import { MenuEntry } from 'src/app/shared/models/menu.model';
 import { Deal, DealCategories, DealFilters } from '../../models/deals.model';
 import { DealsFiltersComponent } from '../deals-filters/deals-filters.component';
+import { DealsFormComponent } from '../deals-form/deals-form.component';
 import { DealsService } from './../../services/deals.service';
 
 @Component({
@@ -37,9 +39,7 @@ export class DealsListComponent implements OnInit, OnDestroy {
 
   public readonly pageActions: PageAction[] = [
     {
-      action: () => {
-        throw new Error('Function not implemented.');
-      },
+      action: () => this.handleDealsForm(),
       label: 'Add',
       icon: 'add',
     },
@@ -86,7 +86,8 @@ export class DealsListComponent implements OnInit, OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly dealsService: DealsService,
-    private readonly bottomSheet: MatBottomSheet
+    private readonly bottomSheet: MatBottomSheet,
+    private readonly dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -95,10 +96,6 @@ export class DealsListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
-  }
-
-  public handleMenuSelection(menu: MenuEntry) {
-    this.router.navigateByUrl(`deals/${menu.path}`);
   }
 
   public isAllSelected(): boolean {
@@ -113,6 +110,10 @@ export class DealsListComponent implements OnInit, OnDestroy {
     } else this.selection.select(...(await firstValueFrom(this.currentDeals$)));
   }
 
+  public handleMenuSelection(menu: MenuEntry): void {
+    this.router.navigateByUrl(`deals/${menu.path}`);
+  }
+
   public handleSearch(deals: Deal[], searchTerm: string): Deal[] {
     if (!searchTerm.length) return deals;
     return deals.filter((deal) =>
@@ -120,22 +121,42 @@ export class DealsListComponent implements OnInit, OnDestroy {
     );
   }
 
-  public openFiltersPane() {
+  public handleDealsForm(): void {
+    const config: MatDialogConfig = {
+      maxWidth: '500px',
+      panelClass: 'full-with-dialog',
+    };
+
+    const component = this.dialog.open(DealsFormComponent, config);
+    component.componentInstance.selectedDealCategory = this.activeMenu
+      .path as DealCategories;
+
+    const sub = component.componentInstance.confirm.subscribe((deal: Deal) => {
+      this.dealsService.setDeal(deal);
+      this.updateDeals();
+      component.close();
+    });
+
+    component
+      .afterClosed()
+      .pipe(first())
+      .subscribe(() => sub?.unsubscribe);
+  }
+
+  public openFiltersPane(): void {
     const ref = this.bottomSheet.open(DealsFiltersComponent);
 
-    const subs = [
-      ref.instance.filtersApplied.subscribe((filters: DealFilters) =>
-        this.activeFilters$.next(filters)
-      ),
-    ];
+    const sub = ref.instance.filtersApplied.subscribe((filters: DealFilters) =>
+      this.activeFilters$.next(filters)
+    );
 
     ref
       .afterDismissed()
       .pipe(first())
-      .subscribe(() => subs.forEach((sub) => sub.unsubscribe()));
+      .subscribe(() => sub.unsubscribe());
   }
 
-  private handleFilters(deals: Deal[], filters?: DealFilters) {
+  private handleFilters(deals: Deal[], filters?: DealFilters): Deal[] {
     if (!filters) return deals;
 
     const minFilter = filters.purchaseMin
@@ -150,11 +171,11 @@ export class DealsListComponent implements OnInit, OnDestroy {
 
   private initializeSubscriptions() {
     this.initializeRouteChangeListener();
-    this.initializeDealCounts();
-    this.initializeDeals();
+    this.updateDealCounts();
+    this.updateDeals();
   }
 
-  private initializeDeals() {
+  private updateDeals(): void {
     this.deals$ = this.route.params.pipe(
       switchMap(() =>
         this.dealsService.getDeals(this.activeMenu.path as DealCategories)
@@ -174,7 +195,7 @@ export class DealsListComponent implements OnInit, OnDestroy {
     );
   }
 
-  private initializeDealCounts() {
+  private updateDealCounts(): void {
     this.subscriptions.push(
       this.dealsService.getDealCounts().subscribe((counts) => {
         Object.entries(counts).forEach(([category, value]) => {
@@ -186,13 +207,13 @@ export class DealsListComponent implements OnInit, OnDestroy {
     );
   }
 
-  private initializeRouteChangeListener() {
+  private initializeRouteChangeListener(): void {
     this.subscriptions.push(
       this.route.params.subscribe((params) => this.handleRouteUpdates(params))
     );
   }
 
-  private handleRouteUpdates(params: Params) {
+  private handleRouteUpdates(params: Params): void {
     const { mode } = params;
 
     const selectedMenu = this.pageMenu.find(
@@ -209,7 +230,7 @@ export class DealsListComponent implements OnInit, OnDestroy {
     }
   }
 
-  private handleRedirect() {
+  private handleRedirect(): void {
     this.router.navigate(['deals', 'acquisitions']);
   }
 }

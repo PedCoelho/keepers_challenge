@@ -11,7 +11,9 @@
 :root {
   @include mat.all-component-themes(theme.$light-theme);
 
+  // Material Overrides
   --mat-bottom-sheet-container-background-color: white;
+  --mdc-dialog-container-color: white;
 }
 
 /* You can add global styles to this file, and also import other style files */
@@ -29,6 +31,24 @@ body {
   margin: 0;
   font-family: inherit;
   background-color: var(--color-background);
+}
+
+.full-with-dialog {
+  position: relative;
+  overflow: auto;
+  width: 500px;
+
+  @media (max-width: 568px) {
+    width: 440px;
+  }
+
+  @media (max-width: 468px) {
+    width: 340px;
+  }
+
+  @media (max-width: 368px) {
+    width: 300px;
+  }
 }
 
 .smaller-density-1 {

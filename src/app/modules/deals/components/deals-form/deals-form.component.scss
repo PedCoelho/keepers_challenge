@@ -1,0 +1,44 @@
+:host {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+  height: 100%;
+}
+.deals-form {
+  &__header {
+    mat-icon {
+      line-height: 28px;
+    }
+    h2,
+    h4 {
+      display: inline-block;
+      margin-top: unset;
+      margin-left: var(--spacing-sm);
+      margin-bottom: var(--spacing-md);
+    }
+    padding: var(--spacing-md);
+  }
+  &__inputs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    mat-form-field {
+      width: 100%;
+      margin-bottom: var(--spacing-md);
+    }
+    padding: var(--spacing-md);
+  }
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    align-self: flex-end;
+
+    button:last-child:not([disabled]) {
+      background-color: var(--color-primary);
+      color: white;
+    }
+  }
+}
