@@ -5,6 +5,11 @@ export enum DealCategories {
   BRIDGE_LENDING = 'bridge-lending',
 }
 
+export interface DealFilters {
+  purchaseMin?: number;
+  purchaseMax?: number;
+}
+
 export interface Deal {
   name: string;
   purchasePrice: number;

@@ -21,9 +21,12 @@ export class DefaultPageComponent implements OnDestroy {
   @Input() pageTitle?: string;
   @Input() pageActions: PageAction[] = [];
   @Input() menuConfig: MenuEntry[] = [];
+  @Input() clearFiltersVisible = false;
 
   @Output() menuTriggered = new EventEmitter<MenuEntry>();
   @Output() searchTriggered = new EventEmitter<string>();
+  @Output() filtersTriggered = new EventEmitter<void>();
+  @Output() filtersCleared = new EventEmitter<void>();
 
   public readonly toolbarHeight = 85;
 
@@ -36,13 +39,14 @@ export class DefaultPageComponent implements OnDestroy {
     );
 
   public search = new FormControl();
-  private subscriptions: Subscription[] = [];
+  private readonly subscriptions: Subscription[] = [];
 
   constructor() {
-    const sub = this.search.valueChanges
-      .pipe(debounceTime(50))
-      .subscribe((val) => this.searchTriggered.emit(val));
-    this.subscriptions.push(sub);
+    this.subscriptions.push(
+      this.search.valueChanges
+        .pipe(debounceTime(50))
+        .subscribe((val) => this.searchTriggered.emit(val))
+    );
   }
 
   ngOnDestroy(): void {

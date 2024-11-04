@@ -1,17 +1,21 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   BehaviorSubject,
+  first,
   firstValueFrom,
   map,
   Observable,
   Subscription,
   switchMap,
 } from 'rxjs';
+import { combineLatest } from 'rxjs/internal/observable/combineLatest';
 import { PageAction } from 'src/app/shared/models/default-page.model';
 import { MenuEntry } from 'src/app/shared/models/menu.model';
-import { Deal, DealCategories } from '../../models/deals.model';
+import { Deal, DealCategories, DealFilters } from '../../models/deals.model';
+import { DealsFiltersComponent } from '../deals-filters/deals-filters.component';
 import { DealsService } from './../../services/deals.service';
 
 @Component({
@@ -65,9 +69,14 @@ export class DealsListComponent implements OnInit, OnDestroy {
   ];
 
   public activeMenu: MenuEntry = this.pageMenu[0];
+
   public deals$!: Observable<Deal[]>;
   public search$: BehaviorSubject<string> = new BehaviorSubject('');
-  public activeFilters$: BehaviorSubject<any> = new BehaviorSubject(null);
+  public activeFilters$: BehaviorSubject<Partial<DealFilters>> =
+    new BehaviorSubject({});
+  public clearFiltersVisible$: Observable<boolean> = this.activeFilters$.pipe(
+    map((filters) => Boolean(filters.purchaseMin ?? filters.purchaseMax))
+  );
 
   public currentDeals$!: Observable<Deal[]>;
 
@@ -76,7 +85,8 @@ export class DealsListComponent implements OnInit, OnDestroy {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly dealsService: DealsService
+    private readonly dealsService: DealsService,
+    private readonly bottomSheet: MatBottomSheet
   ) {}
 
   ngOnInit(): void {
@@ -110,6 +120,34 @@ export class DealsListComponent implements OnInit, OnDestroy {
     );
   }
 
+  public openFiltersPane() {
+    const ref = this.bottomSheet.open(DealsFiltersComponent);
+
+    const subs = [
+      ref.instance.filtersApplied.subscribe((filters: DealFilters) =>
+        this.activeFilters$.next(filters)
+      ),
+    ];
+
+    ref
+      .afterDismissed()
+      .pipe(first())
+      .subscribe(() => subs.forEach((sub) => sub.unsubscribe()));
+  }
+
+  private handleFilters(deals: Deal[], filters?: DealFilters) {
+    if (!filters) return deals;
+
+    const minFilter = filters.purchaseMin
+      ? (deal: Deal) => deal.purchasePrice >= (filters.purchaseMin as number)
+      : () => true;
+    const maxFilter = filters.purchaseMax
+      ? (deal: Deal) => deal.purchasePrice <= (filters.purchaseMax as number)
+      : () => true;
+
+    return deals.filter((deal) => minFilter(deal) && maxFilter(deal));
+  }
+
   private initializeSubscriptions() {
     this.initializeRouteChangeListener();
     this.initializeDealCounts();
@@ -123,10 +161,14 @@ export class DealsListComponent implements OnInit, OnDestroy {
       )
     );
 
-    this.currentDeals$ = this.search$.pipe(
-      switchMap((search) =>
+    this.currentDeals$ = combineLatest([
+      this.activeFilters$,
+      this.search$,
+    ]).pipe(
+      switchMap(([filters, search]) =>
         this.deals$.pipe(
-          map((deals: Deal[]) => this.handleSearch(deals, search))
+          map((deals: Deal[]) => this.handleSearch(deals, search)),
+          map((deals: Deal[]) => this.handleFilters(deals, filters))
         )
       )
     );

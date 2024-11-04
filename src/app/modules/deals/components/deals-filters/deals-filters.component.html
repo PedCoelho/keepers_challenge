@@ -1,0 +1,46 @@
+<section class="filters__header">
+  <mat-icon>filter_list</mat-icon>
+  <h2>Filters</h2>
+</section>
+<section class="filters__inputs" [formGroup]="form">
+  <mat-form-field subscriptSizing="fixed">
+    <mat-label>Price (Min)</mat-label>
+    <input
+      matInput
+      #from
+      type="number"
+      step="100000"
+      [formControl]="form.controls.purchaseMin"
+      [max]="to.value"
+    />
+    <span matTextSuffix>$</span>
+    <mat-error *ngIf="form.controls.purchaseMin.hasError('max')"
+      >Value must be less than or equal to {{ to.value }}</mat-error
+    >
+  </mat-form-field>
+  <mat-form-field subscriptSizing="fixed">
+    <mat-label>Price (Max)</mat-label>
+    <input
+      matInput
+      #to
+      type="number"
+      step="100000"
+      [formControl]="form.controls.purchaseMax"
+      [min]="from.value"
+    />
+    <span matTextSuffix>$</span>
+    <mat-error *ngIf="form.controls.purchaseMax.hasError('min')"
+      >Value must be greater than or equal to {{ from.value }}</mat-error
+    >
+  </mat-form-field>
+</section>
+<section class="filters__footer">
+  <button mat-button secondary (click)="clearFilters()">
+    <mat-icon>close</mat-icon>
+    Clear
+  </button>
+  <button mat-flat-button (click)="applyFilters()" [disabled]="form.invalid">
+    <mat-icon>check</mat-icon>
+    Apply
+  </button>
+</section>

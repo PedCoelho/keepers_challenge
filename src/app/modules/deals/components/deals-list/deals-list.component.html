@@ -2,8 +2,11 @@
   [pageTitle]="activeMenu.label"
   [pageActions]="pageActions"
   [menuConfig]="pageMenu"
+  [clearFiltersVisible]="(clearFiltersVisible$ | async) === true"
   (menuTriggered)="handleMenuSelection($event)"
   (searchTriggered)="search$.next($event)"
+  (filtersTriggered)="openFiltersPane()"
+  (filtersCleared)="activeFilters$.next({})"
 >
   <table
     *ngIf="(currentDeals$ | async) !== null"

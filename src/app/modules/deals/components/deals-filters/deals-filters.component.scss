@@ -1,0 +1,33 @@
+.filters {
+  &__header {
+    mat-icon {
+      line-height: 32px;
+    }
+    h2 {
+      display: inline-block;
+      margin-top: unset;
+      margin-left: var(--spacing-sm);
+      margin-bottom: var(--spacing-md);
+    }
+  }
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    padding-bottom: var(--spacing-md);
+
+    button:last-child:not([disabled]) {
+      background-color: var(--color-primary);
+      color: white;
+    }
+  }
+  &__inputs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    mat-form-field {
+      width: 100%;
+      margin-bottom: var(--spacing-md);
+    }
+  }
+}

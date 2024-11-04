@@ -39,6 +39,18 @@
       </section>
       <section class="toolbar-interactions">
         <section class="toolbar-interactions__search smaller-density-2">
+          <button
+            *ngIf="clearFiltersVisible; else filtersButton"
+            mat-icon-button
+            (click)="filtersCleared.emit()"
+          >
+            <mat-icon>filter_list_off</mat-icon>
+          </button>
+          <ng-template #filtersButton>
+            <button mat-icon-button (click)="filtersTriggered.emit()">
+              <mat-icon>filter_list</mat-icon>
+            </button>
+          </ng-template>
           <mat-form-field>
             <mat-icon matPrefix>search</mat-icon>
             <input
