@@ -2,7 +2,7 @@ import { Route } from '@angular/router';
 import { BadRouteComponent } from './shared/components/bad-route/bad-route.component';
 
 export const appRoutes: Route[] = [
-  { path: '', redirectTo: 'deals/acquisitions', pathMatch: 'full' },
+  { path: '', redirectTo: 'deals', pathMatch: 'full' },
   {
     path: 'deals',
     loadChildren: () =>
