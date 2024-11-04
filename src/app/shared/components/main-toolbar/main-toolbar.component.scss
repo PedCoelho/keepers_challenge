@@ -6,6 +6,28 @@
     height: 50px;
     cursor: pointer;
   }
+
+  section {
+    margin-left: var(--spacing-xl);
+    display: flex;
+  }
+
+  a {
+    margin-left: var(--spacing-xl);
+    color: var(--color-secondary-070);
+    font-size: 14px;
+    text-decoration: none;
+    display: flex;
+    align-content: center;
+
+    &.active {
+      color: var(--color-primary);
+    }
+
+    mat-icon {
+      margin-right: var(--spacing-sm);
+    }
+  }
 }
 
 .mat-toolbar {

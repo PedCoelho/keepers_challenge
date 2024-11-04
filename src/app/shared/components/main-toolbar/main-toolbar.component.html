@@ -1,9 +1,19 @@
 <mat-toolbar class="main-toolbar">
   <img
-    (click)="handleNavigation()"
-    (keydown.enter)="handleNavigation()"
     src="ts-logo.png"
     alt="ts-logo"
     tabindex="0"
+    (click)="handleNavigation()"
+    (keydown.enter)="handleNavigation()"
   />
+  <section *ngIf="(isHandset$ | async) === false">
+    <a href="#">
+      <mat-icon>home</mat-icon>
+      <span>Dashboard</span>
+    </a>
+    <a href="/deals" class="active">
+      <mat-icon>payments</mat-icon>
+      <span>Deals</span>
+    </a>
+  </section>
 </mat-toolbar>

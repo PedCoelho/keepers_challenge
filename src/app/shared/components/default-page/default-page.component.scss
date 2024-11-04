@@ -77,6 +77,11 @@ section {
 
     &__search {
       margin-left: var(--spacing-md);
+      .searchbar {
+        @media (max-width: 468px) {
+          width: 150px;
+        }
+      }
     }
   }
 }
