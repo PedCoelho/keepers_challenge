@@ -1,7 +1,11 @@
-export default {
+import type { Config } from 'jest';
+
+const config: Config = {
   displayName: 'keepers-challenge',
   preset: './jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  collectCoverage: true,
+  coverageReporters: ['json', 'html', 'lcov'],
   coverageDirectory: './coverage/keepers-challenge',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
@@ -23,3 +27,5 @@ export default {
     '<rootDir>/src/**/*(*.)@(spec|test).[jt]s?(x)',
   ],
 };
+
+export default config;

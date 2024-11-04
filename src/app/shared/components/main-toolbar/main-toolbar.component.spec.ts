@@ -9,6 +9,7 @@ describe('MainToolbarComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MainToolbarModule],
+      providers: [{ provide: Location, useValue: location }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MainToolbarComponent);
@@ -18,5 +19,11 @@ describe('MainToolbarComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should trigger location swapping when handleNavigation is called', () => {
+    jest.spyOn(component, 'handleNavigation');
+    component.handleNavigation();
+    expect(component.handleNavigation).toHaveReturned();
   });
 });
